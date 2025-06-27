@@ -3,10 +3,17 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHept
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local camera = workspace.CurrentCamera
+local username = player.Name
 
 local Window = Library.CreateLib("Fly GUI BY akurawr7", "Ocean")
 
--- Character & humanoid
+-- TAB: Home
+local homeTab = Window:NewTab("Home")
+local homeSection = homeTab:NewSection("Welcome")
+homeSection:NewLabel("Welcome, " .. username .. "!")
+homeSection:NewLabel("Owner: akurawr7")
+
+-- === Character ===
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 local humanoid = char:WaitForChild("Humanoid")
@@ -16,7 +23,7 @@ player.CharacterAdded:Connect(function(c)
 	humanoid = c:WaitForChild("Humanoid")
 end)
 
--- Tab: Fly
+-- === TAB: Fly ===
 local flyTab = Window:NewTab("Fly")
 local flySection = flyTab:NewSection("Joystick Fly")
 local flying = false
@@ -45,7 +52,7 @@ flySection:NewButton("🐢 Speed -", "Kurangi kecepatan", function()
 	flySpeed = math.max(flySpeed - 10, 10)
 end)
 
--- Fly logic fix (ikut kamera)
+-- Fly logic arah kamera fix
 game:GetService("RunService").RenderStepped:Connect(function()
 	if flying and bv and bg and hrp and humanoid then
 		local moveDir = humanoid.MoveDirection
@@ -61,7 +68,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	end
 end)
 
--- Tab: Control
+-- === TAB: Control ===
 local controlTab = Window:NewTab("Control")
 local controlSection = controlTab:NewSection("Speed & Noclip")
 
@@ -75,7 +82,6 @@ controlSection:NewButton("🔁 Reset Speed", "16 normal", function()
 	humanoid.WalkSpeed = 16
 end)
 
--- Noclip
 local noclip = false
 controlSection:NewToggle("🚧 Noclip", "Lewat tembok", function(state)
 	noclip = state
@@ -91,11 +97,11 @@ game:GetService("RunService").Stepped:Connect(function()
 	end
 end)
 
--- Tab: Teleport
+-- === TAB: Teleport ===
 local tpTab = Window:NewTab("Teleport")
 local tpSection = tpTab:NewSection("Ke Player")
-
 local playerList = {}
+
 for _, p in pairs(game.Players:GetPlayers()) do
 	if p ~= player then table.insert(playerList, p.Name) end
 end
@@ -103,7 +109,6 @@ end
 game.Players.PlayerAdded:Connect(function(p)
 	table.insert(playerList, p.Name)
 end)
-
 game.Players.PlayerRemoving:Connect(function(p)
 	for i, name in pairs(playerList) do
 		if name == p.Name then table.remove(playerList, i) break end
@@ -117,7 +122,7 @@ tpSection:NewDropdown("Pilih Player", "Teleport ke mereka", playerList, function
 	end
 end)
 
--- 🕶️ & 📂 tombol GUI
+-- === Tombol 🕶️ & 📂 ===
 local core = game:GetService("CoreGui")
 local mainGui
 repeat
@@ -143,13 +148,12 @@ showBtn.Visible = false
 showBtn.ZIndex = 999999
 showBtn.Parent = PlayerGui
 Instance.new("UICorner", showBtn).CornerRadius = UDim.new(0, 8)
-
 showBtn.MouseButton1Click:Connect(function()
 	mainGui.Enabled = true
 	showBtn.Visible = false
 end)
 
--- Tombol 🕶️ samping X
+-- Tombol 🕶️ Samping X
 local header = mainGui:FindFirstChild("MainFrame", true):FindFirstChildWhichIsA("Frame", true)
 if header then
 	local hideBtn = Instance.new("TextButton")
@@ -170,16 +174,15 @@ if header then
 	end)
 end
 
--- Geser Kavo UI Mobile (Fixed)
+-- Geser UI Mobile
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
 	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
 	if not draggableFrame then return end
-
 	draggableFrame.Active = true
 	draggableFrame.Selectable = true
-
 	local dragging, dragInput, dragStart, startPos
+
 	draggableFrame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
