@@ -35,7 +35,6 @@ flySection:NewButton("🛸 Toggle Fly", "Aktif/nonaktif fly", function()
 	else
 		if bv then bv:Destroy() end
 		if bg then bg:Destroy() end
-		bv, bg = nil, nil
 	end
 end)
 
@@ -73,11 +72,11 @@ controlSection:NewButton("🔁 Reset Speed", "16 normal", function()
 	humanoid.WalkSpeed = 16
 end)
 
--- Noclip
 local noclip = false
 controlSection:NewToggle("🚧 Noclip", "Lewat tembok", function(state)
 	noclip = state
 end)
+
 game:GetService("RunService").Stepped:Connect(function()
 	if noclip and char then
 		for _, v in pairs(char:GetDescendants()) do
@@ -91,18 +90,22 @@ end)
 -- TAB 3: Teleport
 local tpTab = Window:NewTab("Teleport")
 local tpSection = tpTab:NewSection("Ke Player")
+
 local playerList = {}
 for _, p in pairs(game.Players:GetPlayers()) do
 	if p ~= player then table.insert(playerList, p.Name) end
 end
+
 game.Players.PlayerAdded:Connect(function(p)
 	table.insert(playerList, p.Name)
 end)
+
 game.Players.PlayerRemoving:Connect(function(p)
 	for i, name in pairs(playerList) do
 		if name == p.Name then table.remove(playerList, i) break end
 	end
 end)
+
 tpSection:NewDropdown("Pilih Player", "Teleport ke mereka", playerList, function(name)
 	local target = game.Players:FindFirstChild(name)
 	if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
@@ -123,7 +126,7 @@ repeat
 	wait()
 until mainGui
 
--- Tombol 📂 Show
+-- 📂 Show GUI
 local showBtn = Instance.new("TextButton")
 showBtn.Size = UDim2.new(0, 120, 0, 40)
 showBtn.Position = UDim2.new(0, 10, 1, -60)
@@ -141,7 +144,7 @@ showBtn.MouseButton1Click:Connect(function()
 	showBtn.Visible = false
 end)
 
--- Tombol 🕶️ di samping X
+-- 🕶️ Hide GUI (samping X)
 local header = mainGui:FindFirstChild("MainFrame", true):FindFirstChildWhichIsA("Frame", true)
 if header then
 	local hideBtn = Instance.new("TextButton")
@@ -161,7 +164,7 @@ if header then
 	end)
 end
 
--- Drag GUI Mobile (FIX .Active)
+-- Drag GUI di Mobile (FIX)
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
 	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
