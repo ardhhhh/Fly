@@ -56,10 +56,13 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	if flying and bv and bg and hrp and humanoid then
 		local moveDir = humanoid.MoveDirection
 		if moveDir.Magnitude > 0 then
-			local camLook = camera.CFrame.LookVector
-			local camRight = camera.CFrame.RightVector
-			local dir = (camLook * moveDir.Z + camRight * moveDir.X)
-			bv.Velocity = dir.Unit * flySpeed
+			local camCF = camera.CFrame
+			local camLook = camCF.LookVector
+			local camRight = camCF.RightVector
+			local camUp = camCF.UpVector
+
+			local moveVec = (camRight * moveDir.X + camLook * moveDir.Z)
+			bv.Velocity = moveVec.Unit * flySpeed
 		else
 			bv.Velocity = Vector3.zero
 		end
@@ -153,7 +156,7 @@ showBtn.MouseButton1Click:Connect(function()
 	showBtn.Visible = false
 end)
 
--- Tombol 🕶️ di samping tombol X
+-- Tombol 🕶️ (Hide)
 local header = mainGui:FindFirstChild("MainFrame", true):FindFirstChildWhichIsA("Frame", true)
 if header then
 	local hideBtn = Instance.new("TextButton")
@@ -173,32 +176,23 @@ if header then
 	end)
 end
 
--- DRAG GUI (Delta Fix)
+-- DRAG GUI (fix for mobile)
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
-	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
-	if not draggableFrame then return end
-	draggableFrame.Active = true
-	draggableFrame.Selectable = true
+	local draggable = mainGui:FindFirstChild("MainFrame", true)
+	if not draggable then return end
+
+	draggable.Active = true
+	draggable.Selectable = true
 
 	local dragging = false
 	local dragStart, startPos
 
-	local function update(input)
-		local delta = input.Position - dragStart
-		draggableFrame.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
-	end
-
-	draggableFrame.InputBegan:Connect(function(input)
+	draggable.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
 			dragStart = input.Position
-			startPos = draggableFrame.Position
+			startPos = draggable.Position
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
 					dragging = false
@@ -209,7 +203,13 @@ task.delay(2, function()
 
 	UIS.InputChanged:Connect(function(input)
 		if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
-			update(input)
+			local delta = input.Position - dragStart
+			draggable.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
 		end
 	end)
 end)
