@@ -161,11 +161,13 @@ if header then
 	end)
 end
 
--- Drag GUI Mobile
+-- Drag GUI Mobile (Fix)
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
 	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
 	if not draggableFrame then return end
+	draggableFrame.Active = true
+	draggableFrame.Selectable = true
 	local dragging, dragInput, dragStart, startPos
 	draggableFrame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
