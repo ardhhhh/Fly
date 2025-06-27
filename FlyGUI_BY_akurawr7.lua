@@ -161,7 +161,7 @@ if header then
 	end)
 end
 
--- Drag GUI Mobile (Fix)
+-- Drag GUI Mobile (FIX .Active)
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
 	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
