@@ -7,13 +7,13 @@ local username = player.Name
 
 local Window = Library.CreateLib("Fly GUI BY akurawr7", "Ocean")
 
--- TAB: Home
+-- HOME
 local homeTab = Window:NewTab("Home")
 local homeSection = homeTab:NewSection("Welcome")
 homeSection:NewLabel("Welcome, " .. username .. "!")
 homeSection:NewLabel("Owner: akurawr7")
 
--- === Character ===
+-- Character Setup
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 local humanoid = char:WaitForChild("Humanoid")
@@ -23,7 +23,7 @@ player.CharacterAdded:Connect(function(c)
 	humanoid = c:WaitForChild("Humanoid")
 end)
 
--- === TAB: Fly ===
+-- FLY
 local flyTab = Window:NewTab("Fly")
 local flySection = flyTab:NewSection("Joystick Fly")
 local flying = false
@@ -52,7 +52,6 @@ flySection:NewButton("🐢 Speed -", "Kurangi kecepatan", function()
 	flySpeed = math.max(flySpeed - 10, 10)
 end)
 
--- Fly logic arah kamera fix
 game:GetService("RunService").RenderStepped:Connect(function()
 	if flying and bv and bg and hrp and humanoid then
 		local moveDir = humanoid.MoveDirection
@@ -68,7 +67,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	end
 end)
 
--- === TAB: Control ===
+-- CONTROL
 local controlTab = Window:NewTab("Control")
 local controlSection = controlTab:NewSection("Speed & Noclip")
 
@@ -82,6 +81,7 @@ controlSection:NewButton("🔁 Reset Speed", "16 normal", function()
 	humanoid.WalkSpeed = 16
 end)
 
+-- Noclip
 local noclip = false
 controlSection:NewToggle("🚧 Noclip", "Lewat tembok", function(state)
 	noclip = state
@@ -97,7 +97,7 @@ game:GetService("RunService").Stepped:Connect(function()
 	end
 end)
 
--- === TAB: Teleport ===
+-- TELEPORT
 local tpTab = Window:NewTab("Teleport")
 local tpSection = tpTab:NewSection("Ke Player")
 local playerList = {}
@@ -122,7 +122,7 @@ tpSection:NewDropdown("Pilih Player", "Teleport ke mereka", playerList, function
 	end
 end)
 
--- === Tombol 🕶️ & 📂 ===
+-- Tombol 🕶️ dan 📂
 local core = game:GetService("CoreGui")
 local mainGui
 repeat
@@ -135,7 +135,7 @@ repeat
 	wait()
 until mainGui
 
--- Tombol Show GUI
+-- Tombol 📂 Show GUI
 local showBtn = Instance.new("TextButton")
 showBtn.Size = UDim2.new(0, 120, 0, 40)
 showBtn.Position = UDim2.new(0, 10, 1, -60)
@@ -174,14 +174,27 @@ if header then
 	end)
 end
 
--- Geser UI Mobile
+-- Geser UI (Delta fix)
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
 	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
 	if not draggableFrame then return end
+
 	draggableFrame.Active = true
 	draggableFrame.Selectable = true
-	local dragging, dragInput, dragStart, startPos
+
+	local dragging = false
+	local dragStart, startPos
+
+	local function update(input)
+		local delta = input.Position - dragStart
+		draggableFrame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
 
 	draggableFrame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -196,21 +209,9 @@ task.delay(2, function()
 		end
 	end)
 
-	draggableFrame.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
-			dragInput = input
-		end
-	end)
-
 	UIS.InputChanged:Connect(function(input)
-		if input == dragInput and dragging then
-			local delta = input.Position - dragStart
-			draggableFrame.Position = UDim2.new(
-				startPos.X.Scale,
-				startPos.X.Offset + delta.X,
-				startPos.Y.Scale,
-				startPos.Y.Offset + delta.Y
-			)
+		if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+			update(input)
 		end
 	end)
 end)
