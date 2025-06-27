@@ -13,7 +13,7 @@ local homeSection = homeTab:NewSection("Welcome")
 homeSection:NewLabel("Welcome, " .. username .. "!")
 homeSection:NewLabel("Owner: akurawr7")
 
--- Character Setup
+-- Character setup
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 local humanoid = char:WaitForChild("Humanoid")
@@ -122,7 +122,7 @@ tpSection:NewDropdown("Pilih Player", "Teleport ke mereka", playerList, function
 	end
 end)
 
--- Tombol 🕶️ dan 📂
+-- TOMBOL 🕶️ & 📂
 local core = game:GetService("CoreGui")
 local mainGui
 repeat
@@ -153,7 +153,7 @@ showBtn.MouseButton1Click:Connect(function()
 	showBtn.Visible = false
 end)
 
--- Tombol 🕶️ Samping X
+-- Tombol 🕶️ di samping tombol X
 local header = mainGui:FindFirstChild("MainFrame", true):FindFirstChildWhichIsA("Frame", true)
 if header then
 	local hideBtn = Instance.new("TextButton")
@@ -167,19 +167,17 @@ if header then
 	hideBtn.ZIndex = 999999
 	hideBtn.Parent = header
 	Instance.new("UICorner", hideBtn).CornerRadius = UDim.new(0, 8)
-
 	hideBtn.MouseButton1Click:Connect(function()
 		mainGui.Enabled = false
 		showBtn.Visible = true
 	end)
 end
 
--- Geser UI (Delta fix)
+-- DRAG GUI (Delta Fix)
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
 	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
 	if not draggableFrame then return end
-
 	draggableFrame.Active = true
 	draggableFrame.Selectable = true
 
