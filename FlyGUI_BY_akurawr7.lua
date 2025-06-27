@@ -6,7 +6,7 @@ local camera = workspace.CurrentCamera
 
 local Window = Library.CreateLib("Fly GUI BY akurawr7", "Ocean")
 
--- Character
+-- Character & humanoid
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 local humanoid = char:WaitForChild("Humanoid")
@@ -16,7 +16,7 @@ player.CharacterAdded:Connect(function(c)
 	humanoid = c:WaitForChild("Humanoid")
 end)
 
--- TAB 1: Fly
+-- Tab: Fly
 local flyTab = Window:NewTab("Fly")
 local flySection = flyTab:NewSection("Joystick Fly")
 local flying = false
@@ -45,20 +45,23 @@ flySection:NewButton("🐢 Speed -", "Kurangi kecepatan", function()
 	flySpeed = math.max(flySpeed - 10, 10)
 end)
 
+-- Fly logic fix (ikut kamera)
 game:GetService("RunService").RenderStepped:Connect(function()
 	if flying and bv and bg and hrp and humanoid then
 		local moveDir = humanoid.MoveDirection
 		if moveDir.Magnitude > 0 then
-			local dir = camera.CFrame:VectorToWorldSpace(moveDir)
+			local camLook = camera.CFrame.LookVector
+			local camRight = camera.CFrame.RightVector
+			local dir = (camLook * moveDir.Z + camRight * moveDir.X)
 			bv.Velocity = dir.Unit * flySpeed
 		else
 			bv.Velocity = Vector3.zero
 		end
-		bg.CFrame = CFrame.new(hrp.Position, hrp.Position + Vector3.new(camera.CFrame.LookVector.X, 0, camera.CFrame.LookVector.Z))
+		bg.CFrame = CFrame.new(hrp.Position, hrp.Position + camera.CFrame.LookVector)
 	end
 end)
 
--- TAB 2: Control
+-- Tab: Control
 local controlTab = Window:NewTab("Control")
 local controlSection = controlTab:NewSection("Speed & Noclip")
 
@@ -72,6 +75,7 @@ controlSection:NewButton("🔁 Reset Speed", "16 normal", function()
 	humanoid.WalkSpeed = 16
 end)
 
+-- Noclip
 local noclip = false
 controlSection:NewToggle("🚧 Noclip", "Lewat tembok", function(state)
 	noclip = state
@@ -87,7 +91,7 @@ game:GetService("RunService").Stepped:Connect(function()
 	end
 end)
 
--- TAB 3: Teleport
+-- Tab: Teleport
 local tpTab = Window:NewTab("Teleport")
 local tpSection = tpTab:NewSection("Ke Player")
 
@@ -113,7 +117,7 @@ tpSection:NewDropdown("Pilih Player", "Teleport ke mereka", playerList, function
 	end
 end)
 
--- Tombol 🕶️ & 📂
+-- 🕶️ & 📂 tombol GUI
 local core = game:GetService("CoreGui")
 local mainGui
 repeat
@@ -126,7 +130,7 @@ repeat
 	wait()
 until mainGui
 
--- 📂 Show GUI
+-- Tombol Show GUI
 local showBtn = Instance.new("TextButton")
 showBtn.Size = UDim2.new(0, 120, 0, 40)
 showBtn.Position = UDim2.new(0, 10, 1, -60)
@@ -139,12 +143,13 @@ showBtn.Visible = false
 showBtn.ZIndex = 999999
 showBtn.Parent = PlayerGui
 Instance.new("UICorner", showBtn).CornerRadius = UDim.new(0, 8)
+
 showBtn.MouseButton1Click:Connect(function()
 	mainGui.Enabled = true
 	showBtn.Visible = false
 end)
 
--- 🕶️ Hide GUI (samping X)
+-- Tombol 🕶️ samping X
 local header = mainGui:FindFirstChild("MainFrame", true):FindFirstChildWhichIsA("Frame", true)
 if header then
 	local hideBtn = Instance.new("TextButton")
@@ -158,19 +163,22 @@ if header then
 	hideBtn.ZIndex = 999999
 	hideBtn.Parent = header
 	Instance.new("UICorner", hideBtn).CornerRadius = UDim.new(0, 8)
+
 	hideBtn.MouseButton1Click:Connect(function()
 		mainGui.Enabled = false
 		showBtn.Visible = true
 	end)
 end
 
--- Drag GUI di Mobile (FIX)
+-- Geser Kavo UI Mobile (Fixed)
 task.delay(2, function()
 	local UIS = game:GetService("UserInputService")
 	local draggableFrame = mainGui:FindFirstChild("MainFrame", true)
 	if not draggableFrame then return end
+
 	draggableFrame.Active = true
 	draggableFrame.Selectable = true
+
 	local dragging, dragInput, dragStart, startPos
 	draggableFrame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -184,11 +192,13 @@ task.delay(2, function()
 			end)
 		end
 	end)
+
 	draggableFrame.InputChanged:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
 			dragInput = input
 		end
 	end)
+
 	UIS.InputChanged:Connect(function(input)
 		if input == dragInput and dragging then
 			local delta = input.Position - dragStart
